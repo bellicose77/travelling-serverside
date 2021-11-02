@@ -4,7 +4,8 @@ const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
 const cors = require('cors');
 const app = express();
-const port = 5000;
+
+const port = process.env.PORT || 5000;
 
 // Middel ware
 
@@ -68,6 +69,30 @@ async function run() {
             const result = await cartCollection.insertOne(package);
             res.json(result);
         });
+
+
+        //UPDATE API
+        app.put('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedService = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+
+                    name: updatedService.name,
+                    description: updatedService.description,
+                    price: updatedService.price,
+                    img: updatedService.img,
+                    duration: updatedService.duration,
+                    email: updatedUser.email
+                },
+            };
+            const result = await servicesCollection.updateOne(filter, updateDoc, options)
+            console.log('updating', id)
+            res.json(result)
+        })
+
 
         //delete oder
 
