@@ -21,11 +21,20 @@ async function run() {
         await client.connect();
         const database = client.db("TourismDB");
         const servicesCollection = database.collection("services");
+        const cartCollection = database.collection("CartCollection");
 
         //get api
 
         app.get('/services', async (req, res) => {
             const cursor = servicesCollection.find({});
+            const services = await cursor.toArray();
+            res.send(services);
+
+        });
+
+        // cart information
+        app.get('/myorder', async (req, res) => {
+            const cursor = cartCollection.find({});
             const services = await cursor.toArray();
             res.send(services);
 
@@ -51,6 +60,23 @@ async function run() {
             console.log(result);
             res.json(result);
         });
+
+        //post api
+
+        app.post('/addtocart', async (req, res) => {
+            const package = req.body;
+            const result = await cartCollection.insertOne(package);
+            res.json(result);
+        });
+
+        //delete oder
+
+        app.delete('/deleteCart/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await cartCollection.deleteOne(query);
+            res.json(result);
+        })
 
     }
     finally {
